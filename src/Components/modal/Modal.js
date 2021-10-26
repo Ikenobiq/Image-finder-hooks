@@ -1,37 +1,37 @@
-import { Component } from "react";
 import PropTypes from "prop-types";
-class Modal extends Component {
-
-  componentDidMount() {
-    window.addEventListener("keydown", this.handleKeyDown);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("keydown", this.handleKeyDown);
-  }
-
-  handleKeyDown = (e) => {
-    if (e.code === "Escape") {
-      this.props.closeModal();
+import { useCallback, useEffect } from "react";
+const Modal = ({ largeImageURL, tags, closeModal }) => {
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.code === "Escape") {
+        closeModal();
+      }
+    },
+    [closeModal]
+  );
+  const hendleOverlay = (e) => {
+    if (e.target === e.currentTarget) {
+      closeModal();
     }
   };
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
 
-  render() {
-    return (
-      <div className="Overlay">
-        <div className="Modal">
-          <img
-            src={this.props.largeImageURL}
-            alt={this.props.tags}
-            className="modal-img"
-          />
-        </div>
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [handleKeyDown]);
+
+  return (
+    <div className="Overlay" onClick={hendleOverlay}>
+      <div className="Modal" onClick={hendleOverlay}>
+        <img src={largeImageURL} alt={tags} className="modal-img" />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
+
 Modal.propTypes = {
   onClose: PropTypes.func.isRequired,
-  // children: PropTypes.node.isRequired,
 };
 export default Modal;
